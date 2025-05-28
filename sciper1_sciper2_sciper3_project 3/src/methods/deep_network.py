@@ -3,8 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import TensorDataset, DataLoader
 
-## MS2
-
+## MS2 Models and Trainer
 
 class MLP(nn.Module):
     """
@@ -50,25 +49,38 @@ class MLP(nn.Module):
 
 
 class CNN(nn.Module):
+    """
+    A Convolutional Neural Network with 3 conv layers and 1 FC layer.
+    """
     def __init__(self, input_channels, n_classes):
         super().__init__()
+        # Convolutional layers with ReLU and padding
         self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, padding=1)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        
+        # Dropout for regularization
         self.dropout = nn.Dropout(0.35)
+
+        # Max-pooling
         self.pool = nn.MaxPool2d(2, 2)
+        
+        # Fully connected layers
         self.fc1 = nn.Linear(128 * 3 * 3, 120)
-        #self.fc_middle=nn.Linear(120, 60)
         self.fc2 = nn.Linear(120, n_classes)
 
     def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x))) # (N, 3, 28, 28)→ (N, 32, 14, 14)
-        x = self.pool(F.relu(self.conv2(x)))  # 14 →  (N, 64, 7, 7)
-        x = self.pool(F.relu(self.conv3(x)))  # 7 → (N, 128, 3, 3)
+        # Conv + ReLU + Pooling layers
+        x = self.pool(F.relu(self.conv1(x))) #(N, 3, 28, 28)→ (N, 32, 14, 14)
+        x = self.pool(F.relu(self.conv2(x))) #(N, 32, 14, 14) →  (N, 64, 7, 7)
+        x = self.pool(F.relu(self.conv3(x))) #(N, 64, 7, 7)→ (N, 128, 3, 3)
+        
+        # Flatten and apply dropout
         x = x.view(x.size(0), -1)
         x = self.dropout(x)
+        
+        # Fully connected layers
         x = F.relu(self.fc1(x))
-        #x=F.relu(self.fc_middle(x))
         return self.fc2(x)
 
 
