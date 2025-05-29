@@ -123,7 +123,7 @@ class Trainer(object):
             self.train_one_epoch(dataloader)
             print(f"Ep {ep +1}/{self.epochs}")
 
-            ### WRITE YOUR CODE HERE if you w ant to do add else at each epoch
+            ### WRITE YOUR CODE HERE 
 
     def train_one_epoch(self, dataloader):
         """
@@ -178,14 +178,11 @@ class Trainer(object):
         pred_labels = []
         with torch.no_grad():
             for inputs in dataloader:  # Unpack inputs from the dataloader tuple
-                #print("inputs shape:", inputs.shape)
-                #inputs = torch.stack(inputs)  # Convert inputs list to a tensor
                 input = inputs[0]
-                #print("inputs type:", type(inputs))
                 outputs = self.model(input)
                 _, predicted = torch.max(outputs.data, 1)
                 pred_labels.append(predicted)
-        pred_labels = torch.cat(pred_labels) #.cat
+        pred_labels = torch.cat(pred_labels) 
         return pred_labels
     
     def fit(self, training_data, training_labels):
